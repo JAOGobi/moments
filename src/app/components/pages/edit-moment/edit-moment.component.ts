@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { Moment } from 'src/app/Moment';
 
@@ -35,7 +36,7 @@ export class EditMomentComponent implements OnInit {
     
     const id = this.moment.id
 
-    const formData = new FormData()
+    const formData = new FormData();
 
     formData.append('title', momentData.title);
     formData.append('description', momentData.description);
@@ -46,7 +47,7 @@ export class EditMomentComponent implements OnInit {
 
     await this.momentService.updateMoment(id!, formData).subscribe();
 
-    this.messagesService.add(`Moment $(id) foi atualizado com sucesso!`);
+    this.messagesService.add(`Momento $(id) foi atualizado com sucesso!`);
 
     this.router.navigate(['/']);
   }

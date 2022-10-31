@@ -1,23 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import {
-  FormGroup,
-  FormControl,
-  Validators,
-  FormGroupDirective,
-} from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormGroupDirective, } from '@angular/forms';
 
 import { MomentService } from 'src/app/services/moment.service';
 import { MessagesService } from 'src/app/services/messages.service';
 import { CommentService } from 'src/app/services/comment.service';
 
+import { ActivatedRoute } from '@angular/router';
+
 import { Moment } from 'src/app/Moment';
 import { Comment } from 'src/app/Comment';
 
 import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 import { faTimes, faEdit } from '@fortawesome/free-solid-svg-icons';
-import { subscribeOn } from 'rxjs';
 
 @Component({
   selector: 'app-moment',
@@ -38,15 +34,15 @@ export class MomentComponent implements OnInit {
     private route: ActivatedRoute,
     private messagesService: MessagesService,
     private router: Router,
-    private CommentService: CommentService
+    private commentService: CommentService
   ) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.momentService
-      .getMoment(id)
-      .subscribe((item) => (this.moment = item.data));
+    this.momentService.getMoment(id).subscribe((item) => {
+      this.moment = item.data;
+    });
 
     this.commentForm = new FormGroup({
       text: new FormControl('', [Validators.required]),
@@ -66,7 +62,7 @@ export class MomentComponent implements OnInit {
     if (id) {
       await this.momentService.removeMoment(id).subscribe();
 
-      this.messagesService.add('Momento excluído com sucesso!');
+      this.messagesService.add(`Momento excluído com sucesso!`);
 
       this.router.navigate(['/']);
     }
@@ -77,17 +73,16 @@ export class MomentComponent implements OnInit {
       return;
     }
 
-    const data: Component = this.commentForm.value;
+    const data: Comment = this.commentForm.value;
 
     data.momentId = Number(this.moment!.id);
 
-    await this.CommentService.createComment(data).subscribe((comment) =>
-      this.moment!.comments!.push(comment.data)
-    );
+    await this.commentService
+      .createComment(data)
+      .subscribe((comment) => this.moment!.comments!.push(comment.data));
 
-    this.messagesService.add('Comentário adicionado!');
+    this.messagesService.add(`Comentário adicionado!`);
 
-    //reseta o form
     this.commentForm.reset();
 
     formDirective.resetForm();
